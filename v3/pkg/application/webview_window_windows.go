@@ -5,8 +5,6 @@ package application
 import (
 	"errors"
 	"fmt"
-	"github.com/wailsapp/wails/v3/internal/assetserver"
-	"github.com/wailsapp/wails/v3/internal/runtime"
 	"net/url"
 	"strconv"
 	"strings"
@@ -15,6 +13,9 @@ import (
 	"time"
 	"unicode/utf16"
 	"unsafe"
+
+	"github.com/wailsapp/wails/v3/internal/assetserver"
+	"github.com/wailsapp/wails/v3/internal/runtime"
 
 	"github.com/bep/debounce"
 	"github.com/wailsapp/go-webview2/webviewloader"
@@ -135,6 +136,34 @@ func (w *windowsWebviewWindow) setAlwaysOnTop(alwaysOnTop bool) {
 func (w *windowsWebviewWindow) setURL(url string) {
 	// Navigate to the given URL in the webview
 	w.chromium.Navigate(url)
+}
+
+func (w *windowsWebviewWindow) url() string {
+	result, _ := w.chromium.GetSource()
+	return result
+}
+
+func (w *windowsWebviewWindow) title() string {
+	result, _ := w.chromium.GetDocumentTitle()
+	return result
+}
+
+func (w *windowsWebviewWindow) canGoBack() bool {
+	result, _ := w.chromium.GetCanGoBack()
+	return result
+}
+
+func (w *windowsWebviewWindow) canGoForward() bool {
+	result, _ := w.chromium.GetCanGoForward()
+	return result
+}
+
+func (w *windowsWebviewWindow) goBack() {
+	w.chromium.GoBack()
+}
+
+func (w *windowsWebviewWindow) goForward() {
+	w.chromium.GoForward()
 }
 
 func (w *windowsWebviewWindow) setResizable(resizable bool) {

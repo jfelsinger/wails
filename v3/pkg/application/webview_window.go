@@ -31,6 +31,12 @@ type (
 		setMaxSize(width, height int)
 		execJS(js string)
 		setBackgroundColour(color RGBA)
+		goBack()
+		goForward()
+		canGoBack() bool
+		canGoForward() bool
+		url() string
+		title() string
 		run()
 		center()
 		size() (int, int)
@@ -1074,6 +1080,48 @@ func (w *WebviewWindow) NativeWindowHandle() (uintptr, error) {
 		return 0, errors.New("native handle unavailable as window is not running")
 	}
 	return w.impl.nativeWindowHandle(), nil
+}
+
+func (w *WebviewWindow) URL() string {
+	if w.impl != nil {
+		return InvokeSyncWithResult(w.impl.url)
+	}
+	return ""
+}
+func (w *WebviewWindow) Title() string {
+	if w.impl != nil {
+		return InvokeSyncWithResult(w.impl.title)
+	}
+	return ""
+}
+func (w *WebviewWindow) CanGoBack() bool {
+	if w.impl != nil {
+		return InvokeSyncWithResult(w.impl.canGoBack)
+	}
+	return false
+}
+func (w *WebviewWindow) CanGoForward() bool {
+	if w.impl != nil {
+		return InvokeSyncWithResult(w.impl.canGoForward)
+	}
+	return false
+}
+func (w *WebviewWindow) GoBack() Window {
+	if w.impl != nil {
+		InvokeSync(func() {
+			w.impl.goBack()
+		})
+	}
+	return w
+}
+func (w *WebviewWindow) GoForward() Window {
+	w.impl.goForward()
+	if w.impl != nil {
+		InvokeSync(func() {
+			w.impl.goForward()
+		})
+	}
+	return w
 }
 
 func (w *WebviewWindow) Focus() {
