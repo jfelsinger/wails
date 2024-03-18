@@ -47,6 +47,7 @@ func (m *windowsApp) initMainLoop() {
 		nil)
 
 	m.mainThreadID, _ = w32.GetWindowThreadProcessId(m.mainThreadWindowHWND)
+	w32.WTSRegisterSessionNotification(m.mainThreadWindowHWND)
 }
 
 func (m *windowsApp) runMainLoop() int {

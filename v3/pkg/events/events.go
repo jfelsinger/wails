@@ -353,6 +353,10 @@ type windowsEvents struct {
 	WindowDragEnter            WindowEventType
 	WindowDragLeave            WindowEventType
 	WindowDragOver             WindowEventType
+	WTSSessionLogon            ApplicationEventType
+	WTSSessionLogoff           ApplicationEventType
+	WTSSessionLock             ApplicationEventType
+	WTSSessionUnlock           ApplicationEventType
 }
 
 func newWindowsEvents() windowsEvents {
@@ -382,6 +386,10 @@ func newWindowsEvents() windowsEvents {
 		WindowDragEnter:            1171,
 		WindowDragLeave:            1172,
 		WindowDragOver:             1173,
+		WTSSessionLogon:            1195,
+		WTSSessionLogoff:           1196,
+		WTSSessionLock:             1197,
+		WTSSessionUnlock:           1198,
 	}
 }
 
@@ -540,6 +548,10 @@ var eventToJS = map[uint]string{
 	1171: "windows:WindowDragEnter",
 	1172: "windows:WindowDragLeave",
 	1173: "windows:WindowDragOver",
+	1195: "windows:WTSSessionLogon",
+	1196: "windows:WTSSessionLogoff",
+	1197: "windows:WTSSessionLock",
+	1198: "windows:WTSSessionUnlock",
 	1174: "common:ApplicationStarted",
 	1175: "common:WindowMaximise",
 	1176: "common:WindowUnMaximise",

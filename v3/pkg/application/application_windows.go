@@ -268,6 +268,18 @@ func (m *windowsApp) wndProc(hwnd w32.HWND, msg uint32, wParam, lParam uintptr) 
 			applicationEvents <- newApplicationEvent(events.Windows.APMPowerSettingChange)
 		}
 		return 0
+	case w32.WM_WTSSESSION_CHANGE:
+		switch wParam {
+		case w32.WTS_SESSION_LOGON:
+			applicationEvents <- newApplicationEvent(events.Windows.WTSSessionLogon)
+		case w32.WTS_SESSION_LOGOFF:
+			applicationEvents <- newApplicationEvent(events.Windows.WTSSessionLogoff)
+		case w32.WTS_SESSION_LOCK:
+			applicationEvents <- newApplicationEvent(events.Windows.WTSSessionLock)
+		case w32.WTS_SESSION_UNLOCK:
+			applicationEvents <- newApplicationEvent(events.Windows.WTSSessionUnlock)
+		}
+		return 0
 	}
 
 	if window, ok := m.windowMap[hwnd]; ok {

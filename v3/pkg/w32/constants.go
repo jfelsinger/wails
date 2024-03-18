@@ -566,6 +566,16 @@ const (
 	WM_DPICHANGED             = 0x02E0
 )
 
+// WTS
+const (
+	NOTIFY_FOR_THIS_SESSION = 0
+	WM_WTSSESSION_CHANGE    = 0x02b1
+	WTS_SESSION_LOGON       = 0x5
+	WTS_SESSION_LOGOFF      = 0x6
+	WTS_SESSION_LOCK        = 0x7
+	WTS_SESSION_UNLOCK      = 0x8
+)
+
 // WM_ACTIVATE
 const (
 	WA_INACTIVE    = 0
