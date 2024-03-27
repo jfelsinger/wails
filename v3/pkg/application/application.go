@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"sync"
 
+	"github.com/wailsapp/wails/v3/internal/operatingsystem"
+
 	"github.com/pkg/browser"
 	"github.com/samber/lo"
 	"github.com/wailsapp/wails/v3/internal/signal"
@@ -30,7 +32,7 @@ var globalApplication *App
 
 // AlphaAssets is the default assets for the alpha application
 var AlphaAssets = AssetOptions{
-	Handler: AssetFileServerFS(alphaAssets),
+	Handler: BundledAssetFileServer(alphaAssets),
 }
 
 func init() {
@@ -128,9 +130,12 @@ func New(appOptions Options) *App {
 	}
 
 	result.plugins = NewPluginManager(appOptions.Plugins, srv)
-	err = result.plugins.Init()
-	if err != nil {
-		globalApplication.fatal("Fatal error in plugins initialisation: " + err.Error())
+	errors := result.plugins.Init()
+	if len(errors) > 0 {
+		for _, err := range errors {
+			globalApplication.error("Error initialising plugin: " + err.Error())
+		}
+		globalApplication.fatal("Fatal error in plugins initialisation")
 	}
 
 	err = result.bindings.AddPlugins(appOptions.Plugins)
@@ -539,7 +544,12 @@ func (a *App) Run() error {
 		return err
 	}
 
-	a.plugins.Shutdown()
+	errors := a.plugins.Shutdown()
+	if len(errors) > 0 {
+		for _, err := range errors {
+			a.error("Error shutting down plugin: " + err.Error())
+		}
+	}
 
 	return nil
 }
@@ -891,11 +901,15 @@ func (a *App) BrowserOpenFile(path string) error {
 }
 
 func (a *App) Environment() EnvironmentInfo {
-	return EnvironmentInfo{
-		OS:    runtime.GOOS,
-		Arch:  runtime.GOARCH,
-		Debug: a.isDebugMode,
+	info, _ := operatingsystem.Info()
+	result := EnvironmentInfo{
+		OS:     runtime.GOOS,
+		Arch:   runtime.GOARCH,
+		Debug:  a.isDebugMode,
+		OSInfo: info,
 	}
+	result.PlatformInfo = a.platformEnvironment()
+	return result
 }
 
 func (a *App) shouldQuit() bool {

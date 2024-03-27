@@ -46,7 +46,7 @@ type (
 		destroy()
 		reload()
 		forceReload()
-		toggleDevTools()
+		openDevTools()
 		zoomReset()
 		zoomIn()
 		zoomOut()
@@ -70,6 +70,8 @@ type (
 		isVisible() bool
 		isFocused() bool
 		setFullscreenButtonEnabled(enabled bool)
+		setMinimiseButtonEnabled(enabled bool)
+		setMaximiseButtonEnabled(enabled bool)
 		focus()
 		show()
 		hide()
@@ -504,7 +506,7 @@ func (w *WebviewWindow) SetMaxSize(maxWidth, maxHeight int) Window {
 }
 
 // ExecJS executes the given javascript in the context of the window.
-func (w *WebviewWindow) ExecJS(_callID, js string) {
+func (w *WebviewWindow) ExecJS(js string) {
 	if w.impl == nil && !w.isDestroyed() {
 		return
 	}
@@ -533,6 +535,26 @@ func (w *WebviewWindow) SetFullscreenButtonEnabled(enabled bool) Window {
 	if w.impl != nil {
 		InvokeSync(func() {
 			w.impl.setFullscreenButtonEnabled(enabled)
+		})
+	}
+	return w
+}
+
+func (w *WebviewWindow) SetMinimiseButtonEnabled(enabled bool) Window {
+	w.options.FullscreenButtonEnabled = enabled
+	if w.impl != nil {
+		InvokeSync(func() {
+			w.impl.setMinimiseButtonEnabled(enabled)
+		})
+	}
+	return w
+}
+
+func (w *WebviewWindow) SetMaximiseButtonEnabled(enabled bool) Window {
+	w.options.FullscreenButtonEnabled = enabled
+	if w.impl != nil {
+		InvokeSync(func() {
+			w.impl.setMaximiseButtonEnabled(enabled)
 		})
 	}
 	return w
@@ -641,7 +663,7 @@ func (w *WebviewWindow) HandleMessage(message string) {
 		w.runtimeLoaded = true
 		w.SetResizable(!w.options.DisableResize)
 		for _, js := range w.pendingJS {
-			w.ExecJS("", js)
+			w.ExecJS(js)
 		}
 	}
 }
@@ -809,11 +831,25 @@ func (w *WebviewWindow) ToggleFullscreen() {
 	})
 }
 
-func (w *WebviewWindow) ToggleDevTools() {
+// ToggleMaximise toggles the window between maximised and normal
+func (w *WebviewWindow) ToggleMaximise() {
 	if w.impl == nil && !w.isDestroyed() {
 		return
 	}
-	InvokeSync(w.impl.toggleDevTools)
+	InvokeSync(func() {
+		if w.IsMaximised() {
+			w.UnMaximise()
+		} else {
+			w.Maximise()
+		}
+	})
+}
+
+func (w *WebviewWindow) OpenDevTools() {
+	if w.impl == nil && !w.isDestroyed() {
+		return
+	}
+	InvokeSync(w.impl.openDevTools)
 }
 
 // ZoomReset resets the zoom level of the webview content to 100%
@@ -954,10 +990,10 @@ func (w *WebviewWindow) Restore() {
 	InvokeSync(func() {
 		if w.IsMinimised() {
 			w.UnMinimise()
-		} else if w.IsMaximised() {
-			w.UnMaximise()
 		} else if w.IsFullscreen() {
 			w.UnFullscreen()
+		} else if w.IsMaximised() {
+			w.UnMaximise()
 		}
 		w.emit(events.Common.WindowRestore)
 	})
@@ -1012,7 +1048,7 @@ func (w *WebviewWindow) SetFrameless(frameless bool) Window {
 
 func (w *WebviewWindow) DispatchWailsEvent(event *WailsEvent) {
 	msg := fmt.Sprintf("_wails.dispatchWailsEvent(%s);", event.ToJSON())
-	w.ExecJS("", msg)
+	w.ExecJS(msg)
 }
 
 func (w *WebviewWindow) dispatchWindowEvent(id uint) {
