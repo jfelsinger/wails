@@ -347,7 +347,7 @@ type windowsEvents struct {
 	WTSSessionLogon            ApplicationEventType
 	WTSSessionLogoff           ApplicationEventType
 	WTSSessionLock             ApplicationEventType
-	WTSSessionUnLock           ApplicationEventType
+	WTSSessionUnlock           ApplicationEventType
 	ApplicationStarted         ApplicationEventType
 	WebViewNavigationCompleted WindowEventType
 	WindowInactive             WindowEventType
@@ -380,7 +380,7 @@ func newWindowsEvents() windowsEvents {
 		WTSSessionLogon:            1200,
 		WTSSessionLogoff:           1201,
 		WTSSessionLock:             1202,
-		WTSSessionUnLock:           1203,
+		WTSSessionUnlock:           1203,
 		ApplicationStarted:         1160,
 		WebViewNavigationCompleted: 1161,
 		WindowInactive:             1162,
@@ -587,5 +587,5 @@ var eventToJS = map[uint]string{
 	1200: "windows:WTSSessionLogon",
 	1201: "windows:WTSSessionLogoff",
 	1202: "windows:WTSSessionLock",
-	1203: "windows:WTSSessionUnLock",
+	1203: "windows:WTSSessionUnlock",
 }
