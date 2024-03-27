@@ -344,6 +344,10 @@ type windowsEvents struct {
 	APMResumeAutomatic         ApplicationEventType
 	APMResumeSuspend           ApplicationEventType
 	APMPowerSettingChange      ApplicationEventType
+	WTSSessionLogon            ApplicationEventType
+	WTSSessionLogoff           ApplicationEventType
+	WTSSessionLock             ApplicationEventType
+	WTSSessionUnLock           ApplicationEventType
 	ApplicationStarted         ApplicationEventType
 	WebViewNavigationCompleted WindowEventType
 	WindowInactive             WindowEventType
@@ -373,6 +377,10 @@ func newWindowsEvents() windowsEvents {
 		APMResumeAutomatic:         1157,
 		APMResumeSuspend:           1158,
 		APMPowerSettingChange:      1159,
+		WTSSessionLogon:            1200,
+		WTSSessionLogoff:           1201,
+		WTSSessionLock:             1202,
+		WTSSessionUnLock:           1203,
 		ApplicationStarted:         1160,
 		WebViewNavigationCompleted: 1161,
 		WindowInactive:             1162,
@@ -576,4 +584,8 @@ var eventToJS = map[uint]string{
 	1197: "common:WindowFilesDropped",
 	1198: "common:WindowRuntimeReady",
 	1199: "common:ThemeChanged",
+	1200: "windows:WTSSessionLogon",
+	1201: "windows:WTSSessionLogoff",
+	1202: "windows:WTSSessionLock",
+	1203: "windows:WTSSessionUnLock",
 }
