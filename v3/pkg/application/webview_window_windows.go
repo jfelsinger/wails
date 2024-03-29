@@ -201,29 +201,41 @@ func (w *windowsWebviewWindow) framelessWithDecorations() bool {
 func (w *windowsWebviewWindow) run() {
 
 	options := w.parent.options
+	hasParent := options.Parent != nil
 
 	w.chromium = edge.NewChromium()
 
 	var exStyle uint
-	exStyle = w32.WS_EX_CONTROLPARENT
+	if hasParent {
+		// exStyle = w32.WS_EX_TOOLWINDOW
+		exStyle = w32.WS_EX_CONTROLPARENT
+	} else {
+		exStyle = w32.WS_EX_CONTROLPARENT
+		if options.AlwaysOnTop {
+			exStyle |= w32.WS_EX_TOPMOST
+		}
+	}
+
 	if options.BackgroundType != BackgroundTypeSolid {
 		exStyle |= w32.WS_EX_NOREDIRECTIONBITMAP
 		if w.parent.options.IgnoreMouseEvents {
 			exStyle |= w32.WS_EX_TRANSPARENT | w32.WS_EX_LAYERED
 		}
 	}
-	if options.AlwaysOnTop {
-		exStyle |= w32.WS_EX_TOPMOST
-	}
-	// If we're frameless, we need to add the WS_EX_TOOLWINDOW style to hide the window from the taskbar
-	if options.Windows.HiddenOnTaskbar {
-		exStyle |= w32.WS_EX_TOOLWINDOW
-	} else {
-		exStyle |= w32.WS_EX_APPWINDOW
+
+	if true || !hasParent {
+		// If we're frameless, we need to add the WS_EX_TOOLWINDOW style to hide the window from the taskbar
+		if options.Windows.HiddenOnTaskbar || hasParent {
+			exStyle |= w32.WS_EX_TOOLWINDOW
+		} else {
+			exStyle |= w32.WS_EX_APPWINDOW
+		}
 	}
 
-	var startX, _ = lo.Coalesce(options.X, w32.CW_USEDEFAULT)
-	var startY, _ = lo.Coalesce(options.Y, w32.CW_USEDEFAULT)
+	// var startX, _ = lo.Coalesce(options.X, w32.CW_USEDEFAULT)
+	// var startY, _ = lo.Coalesce(options.Y, w32.CW_USEDEFAULT)
+	var startX = options.X
+	var startY = options.Y
 
 	var appMenu w32.HMENU
 
@@ -241,8 +253,14 @@ func (w *windowsWebviewWindow) run() {
 	}
 
 	var parent w32.HWND
+	if hasParent {
+		parent = options.Parent.impl.nativeWindowHandle()
+	}
 
 	var style uint = w32.WS_OVERLAPPEDWINDOW
+	if hasParent {
+		style |= w32.WS_CHILD
+	}
 
 	w.hwnd = w32.CreateWindowEx(
 		exStyle,
@@ -282,13 +300,27 @@ func (w *windowsWebviewWindow) run() {
 		// and at that time we can't yet register the window for calling our WndProc method.
 		// This must be called after setResizable above!
 		rcClient := w32.GetWindowRect(w.hwnd)
-		w32.SetWindowPos(w.hwnd,
-			0,
-			int(rcClient.Left),
-			int(rcClient.Top),
-			int(rcClient.Right-rcClient.Left),
-			int(rcClient.Bottom-rcClient.Top),
-			w32.SWP_FRAMECHANGED)
+		fmt.Println("FRAMELESS --- A: ", startX, startY)
+		fmt.Println("FRAMELESS --- B: ", rcClient)
+		if hasParent {
+			w32.SetWindowPos(w.hwnd,
+				0,
+				int(startX),
+				int(startY),
+				int(options.Width),
+				int(options.Height),
+				// int(rcClient.Right-rcClient.Left),
+				// int(rcClient.Bottom-rcClient.Top),
+				w32.SWP_FRAMECHANGED)
+		} else {
+			w32.SetWindowPos(w.hwnd,
+				0,
+				int(rcClient.Left),
+				int(rcClient.Top),
+				int(rcClient.Right-rcClient.Left),
+				int(rcClient.Bottom-rcClient.Top),
+				w32.SWP_FRAMECHANGED)
+		}
 	}
 
 	// Icon
