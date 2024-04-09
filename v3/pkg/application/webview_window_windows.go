@@ -1552,6 +1552,14 @@ func (w *windowsWebviewWindow) flash(enabled bool) {
 	w32.FlashWindow(w.hwnd, enabled)
 }
 
+func (w *windowsWebviewWindow) newWindowRequested(sender *edge.ICoreWebView2, args *edge.ICoreWebView2NewWindowRequestedEventArgs) {
+
+	// Emit DomReady Event
+	windowEvents <- &windowEvent{EventID: uint(events.Windows.WebViewNewWindowRequested), WindowID: w.parent.id}
+	fmt.Println("NewWindowRequested: ", sender, args)
+
+}
+
 func (w *windowsWebviewWindow) navigationCompleted(sender *edge.ICoreWebView2, args *edge.ICoreWebView2NavigationCompletedEventArgs) {
 
 	// Install the runtime core

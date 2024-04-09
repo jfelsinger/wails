@@ -336,6 +336,7 @@ type windowsEvents struct {
 	APMPowerSettingChange      ApplicationEventType
 	ApplicationStarted         ApplicationEventType
 	WebViewNavigationCompleted WindowEventType
+	WebViewNewWindowRequested  WindowEventType
 	WindowInactive             WindowEventType
 	WindowActive               WindowEventType
 	WindowClickActive          WindowEventType
@@ -368,7 +369,8 @@ func newWindowsEvents() windowsEvents {
 		APMResumeSuspend:           1153,
 		APMPowerSettingChange:      1154,
 		ApplicationStarted:         1155,
-		WebViewNavigationCompleted: 1156,
+		WebViewNavigationCompleted: 1199,
+		WebViewNewWindowRequested:  1195,
 		WindowInactive:             1157,
 		WindowActive:               1158,
 		WindowClickActive:          1159,
@@ -573,4 +575,5 @@ var eventToJS = map[uint]string{
 	1192: "common:WindowFilesDropped",
 	1193: "common:WindowRuntimeReady",
 	1194: "common:ThemeChanged",
+	1199: "windows:WebViewNewWindowRequested",
 }
