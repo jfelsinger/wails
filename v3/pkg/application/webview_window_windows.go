@@ -300,8 +300,6 @@ func (w *windowsWebviewWindow) run() {
 		// and at that time we can't yet register the window for calling our WndProc method.
 		// This must be called after setResizable above!
 		rcClient := w32.GetWindowRect(w.hwnd)
-		fmt.Println("FRAMELESS --- A: ", startX, startY)
-		fmt.Println("FRAMELESS --- B: ", rcClient)
 		if hasParent {
 			w32.SetWindowPos(w.hwnd,
 				0,
@@ -1391,6 +1389,7 @@ func (w *windowsWebviewWindow) setupChromium() {
 	chromium.WebResourceRequestedCallback = w.processRequest
 	chromium.ContainsFullScreenElementChangedCallback = w.fullscreenChanged
 	chromium.NavigationCompletedCallback = w.navigationCompleted
+	chromium.NewWindowRequestedCallback = w.newWindowRequested
 	chromium.AcceleratorKeyCallback = w.processKeyBinding
 
 	chromium.Embed(w.hwnd)
@@ -1553,10 +1552,42 @@ func (w *windowsWebviewWindow) flash(enabled bool) {
 }
 
 func (w *windowsWebviewWindow) newWindowRequested(sender *edge.ICoreWebView2, args *edge.ICoreWebView2NewWindowRequestedEventArgs) {
+	options := w.parent.options
+	if options.Windows.OnNewWindowRequested != nil {
+		options.Windows.OnNewWindowRequested(sender, args)
+	}
+
+	// fmt.Println("newWindowRequested: -- ", sender, args)
+
+	// uri, err := args.GetUri()
+	// fmt.Println("newWindowRequested: uri- ", uri, err)
+
+	// userInitiated, err := args.GetIsUserInitiated()
+	// fmt.Println("newWindowRequested: isUserInitiated1- ", userInitiated, err)
+
+	// handled, err := args.GetHandled()
+	// fmt.Println("newWindowRequested: handled1- ", handled, err)
+	// err = args.PutHandled(true)
+	// fmt.Println("NewWindowRequested: putHandled- ", err)
+	// handled, err = args.GetHandled()
+	// fmt.Println("newWindowRequested: handled2- ", handled, err)
+
+	// userInitiated, err = args.GetIsUserInitiated()
+	// fmt.Println("newWindowRequested: isUserInitiated2- ", userInitiated, err)
+
+	// name, err := args.GetName()
+	// fmt.Println("newWindowRequested: name- ", name, err)
+
+	// err = args.PutNewWindow(sender)
+	// fmt.Println("NewWindowRequested: putNewWindow- ", sender, err)
+
+	// newWindow, err := args.GetNewWindow()
+	// fmt.Println("GetWindowRequested: getNewWindow- ", newWindow, sender, err)
+
+	// fmt.Println("----- ----- ----- ----- -----")
 
 	// Emit DomReady Event
 	windowEvents <- &windowEvent{EventID: uint(events.Windows.WebViewNewWindowRequested), WindowID: w.parent.id}
-	fmt.Println("NewWindowRequested: ", sender, args)
 
 }
 

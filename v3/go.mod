@@ -118,4 +118,6 @@ require (
 	mvdan.cc/sh/v3 v3.7.0 // indirect
 )
 
-replace github.com/wailsapp/go-webview2 => ../../go-webview2
+// replace github.com/wailsapp/go-webview2 => ../../go-webview2
+// replace github.com/wailsapp/go-webview2 =>  github.com/jfelsinger/go-webview2 wip-tab-stop
+replace github.com/wailsapp/go-webview3 => github.com/jfelsinger/go-webview2 v0.0.0-20240415162307-a6599e34835e

@@ -1,6 +1,7 @@
 package application
 
 import (
+	"github.com/wailsapp/go-webview2/pkg/edge"
 	"github.com/wailsapp/wails/v3/pkg/events"
 )
 
@@ -114,6 +115,8 @@ type WindowsWindow struct {
 	// Drag Cursor Effects
 	OnEnterEffect DragEffect
 	OnOverEffect  DragEffect
+
+	OnNewWindowRequested func(sender *edge.ICoreWebView2, args *edge.ICoreWebView2NewWindowRequestedEventArgs)
 
 	// Permissions map for WebView2. If empty, default permissions will be granted.
 	Permissions map[CoreWebView2PermissionKind]CoreWebView2PermissionState
